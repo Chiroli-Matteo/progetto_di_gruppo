@@ -8,12 +8,30 @@
 </head>
 <body class="bg-light">
     <div class="container py-5">
-        <div class="card shadow-sm">
+        <div class="d-flex justify-content-between mb-4">
+            <h1>Benvenuto, {{ username }}!</h1>
+            <a href="/logout" class="btn btn-danger">Exit</a>
+        </div>
+
+        <div class="card mb-3 shadow-sm">
             <div class="card-body text-center">
-                <h1 class="mb-4">Benvenuto, {{ username }}!</h1>
-                <p class="lead">Siamo felici di averti qui.</p>
-                <a href="/logout" class="btn btn-danger">Logout</a>
+                <h2>Post recenti</h2>
+                {% for post in posts %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <p>{{ post.content }}</p>
+                            <small>Postato da {{ post.user.username }}</small>
+                        </div>
+                    </div>
+                {% endfor %}
             </div>
+        </div>
+
+        <!-- Bottone per creare un nuovo post -->
+        <div class="position-fixed bottom-0 end-0 p-3">
+            <a href="/create_post" class="btn btn-success btn-lg rounded-circle">
+                <span class="h3">+</span>
+            </a>
         </div>
     </div>
 </body>

@@ -1,0 +1,21 @@
+/* File: static/styles.css */
+body {
+    font-family: 'Arial', sans-serif;
+}
+
+.card {
+    border-radius: 10px;
+}
+
+button {
+    border-radius: 30px;
+}
+
+.position-fixed {
+    bottom: 20px;
+    right: 20px;
+}
+
+textarea {
+    resize: none;
+}

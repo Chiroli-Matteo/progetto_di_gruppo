@@ -17,12 +17,20 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(150), nullable=False, unique=True)
     password = db.Column(db.String(150), nullable=False)
+    posts = db.relationship('Post', back_populates='user')
+
+class Post(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(db.String(500), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user = db.relationship('User', back_populates='posts')
 
 # Rotta per la homepage
 @app.route('/')
 def home():
     if "user" in session:
-        return render_template('home.html', username=session['user'])
+        posts = Post.query.all()  # Ottieni tutti i post
+        return render_template('home.html', username=session['user'], posts=posts)
     return redirect(url_for('login'))
 
 # Rotta per la registrazione
@@ -51,7 +59,6 @@ def register():
             return render_template('register.html', error="Errore: username già esistente.")
     return render_template('register.html')
 
-
 # Rotta per il login
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -71,6 +78,31 @@ def login():
 def logout():
     session.pop('user', None)
     return redirect(url_for('login'))
+
+# Rotta per creare un nuovo post
+@app.route('/create_post', methods=['GET', 'POST'])
+def create_post():
+    if "user" not in session:
+        return redirect(url_for('login'))
+
+    user = User.query.filter_by(username=session['user']).first()  # Recupera l'utente dalla sessione
+    if user is None:  # Aggiungi un controllo in caso di utente non trovato
+        return redirect(url_for('login'))  # Se l'utente non esiste, torna alla pagina di login
+
+    if request.method == 'POST':
+        content = request.form['content']
+
+        new_post = Post(content=content, user_id=user.id)
+
+        try:
+            db.session.add(new_post)
+            db.session.commit()
+            return redirect(url_for('home'))
+        except:
+            return "Errore nel creare il post."
+
+    return render_template('new_post.html')
+
 
 # Esegui l'app
 if __name__ == "__main__":
